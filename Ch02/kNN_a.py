@@ -85,7 +85,6 @@ def file2matrix(filename):
             classLabelVector.append(love_dictionary.get(listFromLine[-1]))
         index += 1
     return returnMat,classLabelVector
-
     
 def autoNorm(dataSet):
     minVals = dataSet.min(0)
@@ -98,18 +97,22 @@ def autoNorm(dataSet):
     return normDataSet, ranges, minVals
    
 def datingClassTest():
-    hoRatio = 0.50      #hold out 10%
+    hoRatio = 0.10      #hold out 10%
     datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')       #load data setfrom file
     normMat, ranges, minVals = autoNorm(datingDataMat)
     m = normMat.shape[0]
     numTestVecs = int(m*hoRatio)
     errorCount = 0.0
     for i in range(numTestVecs):
+				# Test for the first numTesVecs
+				# So the normMat (standardized) shall begin from numTestVecs to the last row
+				# The test object lies in Row<i> of normMat. (Presentation as normMat[i,:]
         classifierResult = classify0(normMat[i,:],normMat[numTestVecs:m,:],datingLabels[numTestVecs:m],3)
         print "the classifier came back with: %d, the real answer is: %d" % (classifierResult, datingLabels[i])
         if (classifierResult != datingLabels[i]): errorCount += 1.0
-    print "the total error rate is: %f" % (errorCount/float(numTestVecs))
-    print errorCount
+    print "test case(s) in all: %d" % numTestVecs
+    print "the total error rate is: %.2f%%" % (100 * errorCount/float(numTestVecs))
+    print "error case(s) in all: %d" % int(errorCount)
     
 def classifyPerson():
     resultList = ['not at all', 'in small doses', 'in large doses']

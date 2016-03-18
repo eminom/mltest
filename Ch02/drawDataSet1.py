@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-def drawNow(dataSet):
+def drawNow(dataSet, normalized):
 	ic = [-1]
 	def genColor():
 		ic[0] += 1
@@ -21,7 +21,8 @@ def drawNow(dataSet):
 		types.append(ax.scatter(dataSet[kind][:,0], dataSet[kind][:,1], c=genColor(), s=40))
 		titles.append(kind)
 	ax.legend(types, titles, loc=2)
-	ax.axis([0,1,0,1])
+	if normalized:
+		ax.axis([0,1,0,1])
 	plt.xlabel('Frequent Flyier Miles Earned Per Year')
 	plt.ylabel('Percentage of Time Spent Playing Video Games')
 	plt.show()
@@ -79,5 +80,7 @@ if '__main__' == __name__:
 		name = sys.argv[1]
 	print 'reading from %s' % name
 	ds = loadData(name)
-	doNormalize(ds)
-	drawNow(ds)	
+	do_norm = False
+	if do_norm:
+		doNormalize(ds)
+	drawNow(ds, do_norm)	
