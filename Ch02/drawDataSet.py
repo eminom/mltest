@@ -1,4 +1,8 @@
 
+
+# Draw the data set from dating test data set.
+# So the axis of x and y are predefined.
+
 import os
 import sys
 import numpy as np
@@ -57,11 +61,13 @@ def drawDataSet(dataSet, labels):
 		color = dcMap[label]
 		print label, color
 		print 'count = %d, %d' % (len(xc[label]), len(yc[label]))
-		types.append(ax.scatter(xc[label], yc[label], c = color))
+		types.append(ax.scatter(xc[label], yc[label], c = color, s=40))
 		titles.append(label)
 	
 	ax.legend(types, titles, loc=2)
 	ax.axis([0,1,0,1])
+	plt.xlabel('Frequent Flyier Miles Earned Per Year')
+	plt.ylabel('Percentage of Time Spent Playing Video Games')
 	plt.show()
 	
 if '__main__' == __name__:
