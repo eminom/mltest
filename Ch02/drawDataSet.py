@@ -57,7 +57,7 @@ def drawDataSet(dataSet, labels):
 		color = dcMap[label]
 		print label, color
 		print 'count = %d, %d' % (len(xc[label]), len(yc[label]))
-		types.append(ax.scatter(xc[label], yc[label], c = color, backgroundcolor="grey"))
+		types.append(ax.scatter(xc[label], yc[label], c = color))
 		titles.append(label)
 	
 	ax.legend(types, titles, loc=2)
