@@ -11,11 +11,11 @@ Output:     the most popular class label
 
 @author: pbharrin
 '''
-from numpy import *
+import numpy as np
 import operator
 import matplotlib
 import matplotlib.pyplot as plt
-from os import listdir
+import os
 
 # The k shall neither be too large nor too small
 # Too Small: Lack of comparions
@@ -23,7 +23,7 @@ from os import listdir
 # in:k: How many neighbours are taken into account.
 def classify0(inX, dataSet, labels, k):
     dataSetSize = dataSet.shape[0]
-    diffMat = tile(inX, (dataSetSize,1)) - dataSet
+    diffMat = np.tile(inX, (dataSetSize,1)) - dataSet
     sqDiffMat = diffMat**2
     sqDistances = sqDiffMat.sum(axis=1)
     distances = sqDistances**0.5
@@ -72,7 +72,7 @@ def file2matrix(filename):
     fr = open(filename)
     arrayOLines = fr.readlines()
     numberOfLines = len(arrayOLines)            #get the number of lines in the file
-    returnMat = zeros((numberOfLines,3))        #prepare matrix to return
+    returnMat = np.zeros((numberOfLines,3))        #prepare matrix to return
     classLabelVector = []                       #prepare labels return   
     index = 0
     for line in arrayOLines:
@@ -90,10 +90,10 @@ def autoNorm(dataSet):
     minVals = dataSet.min(0)
     maxVals = dataSet.max(0)
     ranges = maxVals - minVals
-    normDataSet = zeros(shape(dataSet))
+    normDataSet = np.zeros(np.shape(dataSet))
     m = dataSet.shape[0]
-    normDataSet = dataSet - tile(minVals, (m,1))
-    normDataSet = normDataSet/tile(ranges, (m,1))   #element wise divide
+    normDataSet = dataSet - np.tile(minVals, (m, 1))
+    normDataSet = normDataSet/np.tile(ranges, (m, 1))      #element wise divide
     return normDataSet, ranges, minVals
    
 def datingClassTest():
@@ -128,26 +128,26 @@ def classifyPerson():
     print "You will probably like this person: %s" % resultList[classifierResult - 1]
     
 def img2vector(filename):
-    returnVect = zeros((1,1024))
-    fr = open(filename)
-    for i in range(32):
-        lineStr = fr.readline()
+    returnVect = np.zeros((1,1024))
+    with open(filename) as fin:
+      for i in range(32):
+        lineStr = fin.readline()
         for j in range(32):
-            returnVect[0,32*i+j] = int(lineStr[j])
+          returnVect[0, 32*i+j] = int(lineStr[j])
     return returnVect
 
 def handwritingClassTest():
     hwLabels = []
-    trainingFileList = listdir('trainingDigits')           #load the training set
+    trainingFileList = os.listdir('trainingDigits')           #load the training set
     m = len(trainingFileList)
-    trainingMat = zeros((m,1024))
+    trainingMat = np.zeros((m,1024))
     for i in range(m):
         fileNameStr = trainingFileList[i]
         fileStr = fileNameStr.split('.')[0]     #take off .txt
         classNumStr = int(fileStr.split('_')[0])
         hwLabels.append(classNumStr)
-        trainingMat[i,:] = img2vector('trainingDigits/%s' % fileNameStr)
-    testFileList = listdir('testDigits')        #iterate through the test set
+        trainingMat[i, :] = img2vector('trainingDigits/%s' % fileNameStr)
+    testFileList = os.listdir('testDigits')        #iterate through the test set
     errorCount = 0.0
     mTest = len(testFileList)
     for i in range(mTest):
@@ -157,6 +157,7 @@ def handwritingClassTest():
         vectorUnderTest = img2vector('testDigits/%s' % fileNameStr)
         classifierResult = classify0(vectorUnderTest, trainingMat, hwLabels, 3)
         print "the classifier came back with: %d, the real answer is: %d" % (classifierResult, classNumStr)
-        if (classifierResult != classNumStr): errorCount += 1.0
+        if (classifierResult != classNumStr): 
+          errorCount += 1.0
     print "\nthe total number of errors is: %d" % errorCount
     print "\nthe total error rate is: %f" % (errorCount/float(mTest))
