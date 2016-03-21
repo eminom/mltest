@@ -12,6 +12,7 @@ def plotNode(nodeTxt, centerPt, parentPt, nodeType):
 		va = "center", ha = "center", bbox = nodeType,
 		arrowprops=arrow_args)
 
+"""
 def createPlot():
 	fig = plt.figure(1, facecolor='white')
 	fig.clf()
@@ -19,6 +20,7 @@ def createPlot():
 	plotNode('a decision node', (0.5, 0.1), (0.1, 0.5), decisionNode)
 	plotNode('a leaf node', (0.8, 0.1), (0.3, 0.8), leafNode)
 	plt.show()
+"""
 
 def getNumLeafs(myTree):
 	numLeafs = 0
@@ -44,30 +46,38 @@ def getTreeDepth(myTree):
 			maxDepth = thisDepth
 	return maxDepth
 
-def plotMidText(cntrPt, parentPt, txtString):
-	xMid = (parentPt[0] - cntrPt[0])/2.0 + cntrPt[0]
-	yMid = (parentPt[1] - cntrPt[1])/2.0 + cntrPt[1]
-	createPlot.ax1.text(xMid, yMid, txtString)
+#cp: center point
+#pp: point, just point
+def plotMidText(cp, pp, txt):
+	xm = (cp[0] - pp[0])/2.0 + pp[0]
+	ym = (cp[1] - pp[1])/2.0 + pp[1]
+	createPlot.ax1.text(xm, ym, txt)
 
 def plotTree(myTree, parentPt, nodeTxt):
 	numLeafs = getNumLeafs(myTree)
 	getTreeDepth(myTree)   # What's the use of this line.
 	firstStr = myTree.keys()[0]
-	cntrPt = (plotTree.xOff + (1.0 + float(numLeafs)) / 2.0 / plotTree.totalW,
-		plotTree.yOff)
+	cntrPt = (
+	  plotTree.xOff + (1.0 + float(numLeafs)) / 2.0 / plotTree.totalW,
+		plotTree.yOff
+	)
 	plotMidText(cntrPt, parentPt, nodeTxt)
 	plotNode(firstStr, cntrPt, parentPt, decisionNode)
 	secondDict = myTree[firstStr]
-	plotTree.yOff = plotTree.yOff - 1.0 / plotTree.totalD
+	yStep = 1.0 / plotTree.totalD
+	xStep = 1.0 / plotTree.totalW
+	plotTree.yOff = plotTree.yOff - yStep
 	for key in secondDict.keys():
 		if type(secondDict[key]).__name__ == 'dict':
 			plotTree(secondDict[key], cntrPt, str(key))
 		else:
-			plotTree.xOff = plotTree.xOff + 1.0 / plotTree.totalW
+			plotTree.xOff = plotTree.xOff + xStep
 			plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff),
 				cntrPt, leafNode)
 			plotMidText( (plotTree.xOff, plotTree.yOff), cntrPt, str(key))
-	plotTree.yOff = plotTree.yOff + 1.0 / plotTree.totalD
+	plotTree.yOff = plotTree.yOff + yStep
+	# y-step
+	# OK. You are good to go
 
 def createPlot(inTree):
 	fig = plt.figure(1, facecolor = 'white')
