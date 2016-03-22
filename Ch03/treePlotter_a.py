@@ -106,3 +106,10 @@ def createPlot(inTree):
 	plotTree.yOff   = 1.0
 	plotTree(inTree, (0.5, 1.0), '')
 	plt.show()
+
+
+def grabTree(filepath):
+	import pickle
+	with open(filepath) as fin:
+		return pickle.load(fin)
+
