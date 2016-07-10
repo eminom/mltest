@@ -1,115 +1,130 @@
 
 
-
 import matplotlib.pyplot as plt
 
 decisionNode = dict(boxstyle="sawtooth", fc = "0.8")
-leafNode = dict(boxstyle="round4", fc = "0.8")
-arrow_args = dict(arrowstyle="<-")
+leafNode     = dict(boxstyle="round4", fc = "0.8")
+arrow_args   = dict(arrowstyle="<-")
 
-def plotNode(nodeTxt, centerPt, parentPt, nodeType):
-	createPlot.ax1.annotate(nodeTxt
-		, xy = parentPt
-	  , xycoords = "axes fraction"
-		, xytext = centerPt
-		, textcoords = 'axes fraction'
-		,	va = "center"
-		, ha = "center"
-		, bbox = nodeType,  # decision-node or leaf-node
-		arrowprops=arrow_args
-	)
-
-"""
-def createPlot():
-	fig = plt.figure(1, facecolor='white')
-	fig.clf()
-	createPlot.ax1 = plt.subplot(111, frameon=False)
-	plotNode('a decision node', (0.5, 0.1), (0.1, 0.5), decisionNode)
-	plotNode('a leaf node', (0.8, 0.1), (0.3, 0.8), leafNode)
-	plt.show()
-"""
+def _firstKey(dc):
+	for i in dc:
+		return i
+	raise RuntimeError("No hay lleva en el dict")
 
 
 #Easy
 def getNumLeafs(myTree):
 	numLeafs = 0
-	firstStr = myTree.keys()[0]
+	firstStr = _firstKey(myTree)
 	secondDict = myTree[firstStr]
 	for key in secondDict.keys():
-		if type(secondDict[key]).__name__ == 'dict':
+		if type(secondDict[key]) == dict:
 			numLeafs += getNumLeafs(secondDict[key])
 		else:
 			numLeafs += 1
 	return numLeafs
 
+def getBranches(myTree):
+	numBranches = 0
+	for k in myTree[_firstKey(myTree)]:
+		numBranches += 1
+	return numBranches
+
 #Easy
 def getTreeDepth(myTree):
 	maxDepth = 0
-	firstStr = myTree.keys()[0]
+	firstStr = _firstKey(myTree)
 	secondDict = myTree[firstStr]
 	for key in secondDict.keys():
-		if type(secondDict[key]).__name__ == 'dict':
+		if type(secondDict[key]) == dict:
 			thisDepth = 1 + getTreeDepth(secondDict[key])
 		else:
 			thisDepth = 1
 		maxDepth = max(maxDepth, thisDepth)
 	return maxDepth
 
-#cp: center point
-#pp: point, just point
-def plotMidText(cp, pp, txt):
-	xm = (cp[0] - pp[0])/2.0 + pp[0]
-	ym = (cp[1] - pp[1])/2.0 + pp[1]
-	createPlot.ax1.text(xm, ym, txt)
+class TreePlotter():
+	def __init__(self):
+		print("Initiation of TreePlotter")
+		pass
 
-def plotTree(myTree, parentPt, nodeTxt):
-	numLeafs = getNumLeafs(myTree)
-	#getTreeDepth(myTree)   # What's the use of this line.
-	firstStr = myTree.keys()[0]
+	def startPlot(self, inTree):
+		print("Drawing in TreePlotter!")
+		self._fig = plt.figure(1, facecolor = 'white')
+		#fig.clf()  # Don't know what it is.
+		self.__ax1 = plt.subplot(111, **dict(frameon=False, xticks=[], yticks=[]))
+		yInterv = 1.0 / getTreeDepth(inTree)   ## The span between two adjacent levels.
+		xInterv = 0.5 / getNumLeafs(inTree)
+		self.__plotTree(inTree
+			, (0.5, 1.0)
+			, ''
+			, 1.0, yInterv
+			, 0.5, xInterv
+			, 1.0 # The full width (for you to split)
+		)
+		plt.show()  #And it is ready to show.
 
-	cntrPt = (
-	  plotTree.xOff + (1.0 + float(numLeafs)) * (1.0 / plotTree.totalW) / 2.0,
-		plotTree.yOff
-	)
+	def __plotMidText(self, cp, pp, txt):
+		xm = (cp[0] - pp[0])/2.0 + pp[0]
+		ym = (cp[1] - pp[1])/2.0 + pp[1]
+		self.__ax1.text(xm, ym, txt)
 
-	plotMidText(cntrPt, parentPt, nodeTxt)
-	plotNode(firstStr, cntrPt, parentPt, decisionNode)
-	secondDict = myTree[firstStr]
+	def __plotNode(self, nodeTxt, centerPt, parentPt, nodeType):
+		self.__ax1.annotate(nodeTxt
+			, xy = parentPt
+		    , xycoords = "axes fraction"
+			, xytext = centerPt
+			, textcoords = 'axes fraction'
+			, va = "center"
+			, ha = "center"
+			, bbox = nodeType  # decision-node or leaf-node
+			, arrowprops=arrow_args
+		)
 
-	yStep = 1.0 / plotTree.totalD
-	xStep = 1.0 / plotTree.totalW
+	def __plotLeaf(self, nodeTxt, centerPt, parentPt, midText):
+		self.__plotNode(nodeTxt, centerPt, parentPt, leafNode)
+		self.__plotMidText( centerPt, parentPt, midText)
 
-	plotTree.yOff = plotTree.yOff - yStep
-
-	for key in secondDict.keys():
-		if type(secondDict[key]).__name__ == 'dict':
-			plotTree(secondDict[key], cntrPt, str(key))
-		else:
-			plotTree.xOff = plotTree.xOff + xStep
-			#@ 
-			plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff),
-				cntrPt, leafNode)
-			plotMidText( (plotTree.xOff, plotTree.yOff), cntrPt, str(key))
-
-	plotTree.yOff = plotTree.yOff + yStep
-	# y-step
-	# OK. You are good to go
-
-def createPlot(inTree):
-	fig = plt.figure(1, facecolor = 'white')
-	#fig.clf()
-	axprops         = dict(xticks=[], yticks=[])
-	createPlot.ax1  = plt.subplot(111, frameon = False, **axprops)
-	plotTree.totalW = float(getNumLeafs(inTree))
-	plotTree.totalD = float(getTreeDepth(inTree))
-	plotTree.xOff   = -0.5/plotTree.totalW
-	plotTree.yOff   = 1.0
-	plotTree(inTree, (0.5, 1.0), '')
-	plt.show()
-
+	def __plotTree(self, myTree, parentPt, nodeTxt, yCoord, yStep, xCoord, xStep, fullWidth):
+		firstStr = _firstKey(myTree)   # Used to be
+		cntrPt = (xCoord, yCoord)
+		self.__plotMidText(cntrPt, parentPt, nodeTxt)
+		self.__plotNode(firstStr, cntrPt, parentPt, decisionNode)
+		secondDict = myTree[firstStr]
+		
+		leafsCount = getNumLeafs(myTree)
+		xStart = xCoord - fullWidth * 0.5
+		yStart = yCoord - yStep
+		
+		width = {}
+		totWidth = 0
+		for key, obj in secondDict.items():
+			if type(obj) == dict:
+				thisWidth  = getNumLeafs(obj)
+				width[key] = thisWidth
+				totWidth   += thisWidth
+			else:
+				totWidth += 1
+				
+		startWidth = 0
+		for key, obj in secondDict.items():
+			if type(obj) == dict:
+				thisWidth = fullWidth * width[key] / totWidth
+				self.__plotTree(secondDict[key], cntrPt, str(key)
+					, yCoord - yStep, yStep
+					, xStart + startWidth + thisWidth * 0.5, xStep
+					, thisWidth
+					)
+			else:
+				thisWidth = fullWidth / totWidth
+				self.__plotLeaf(secondDict[key]
+					, (xStart + startWidth + thisWidth * 0.5, yStart)
+					, cntrPt
+					, str(key)
+				)
+			startWidth += thisWidth
 
 def grabTree(filepath):
 	import pickle
 	with open(filepath) as fin:
 		return pickle.load(fin)
-
