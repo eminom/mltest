@@ -17,15 +17,15 @@ colors =[]
 fw = open('testSet.txt','w')
 for i in range(n):
     [r0,r1] = random.standard_normal(2)
-    myClass = random.uniform(0,1)
+    myClass = random.uniform(0, 1)
     if (myClass <= 0.5):
         fFlyer = r0 + 9.0
         tats = 1.0*r1 + fFlyer - 9.0
         xcord0.append(fFlyer)
         ycord0.append(tats)
     else:
-        fFlyer = r0 + 2.0
-        tats = r1+fFlyer - 2.0
+        fFlyer = r0 + 7.0
+        tats = r1+fFlyer - 7.0
         xcord1.append(fFlyer)
         ycord1.append(tats)
     #fw.write("%f\t%f\t%d\n" % (fFlyer, tats, classLabel))

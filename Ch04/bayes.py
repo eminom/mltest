@@ -29,7 +29,7 @@ def setOfWords2Vec(vocabList, inputSet):
         else: print "the word: %s is not in my Vocabulary!" % word
     return returnVec
 
-def trainNB0(trainMatrix,trainCategory):
+def trainNB0(trainMatrix, trainCategory):
     numTrainDocs = len(trainMatrix)
     numWords = len(trainMatrix[0])
     pAbusive = sum(trainCategory)/float(numTrainDocs)
@@ -42,9 +42,15 @@ def trainNB0(trainMatrix,trainCategory):
         else:
             p0Num += trainMatrix[i]
             p0Denom += sum(trainMatrix[i])
-    p1Vect = log(p1Num/p1Denom)          #change to log()
-    p0Vect = log(p0Num/p0Denom)          #change to log()
-    return p0Vect,p1Vect,pAbusive
+    print("p1Num is ", p1Num)
+    print("p0Num is ", p0Num)
+    print("p1Denom is ", p1Denom)
+    print("p0Denom is ", p0Denom)
+    #p1Vect = p1Num/p1Denom          #change to log()
+    #p0Vect = p0Num/p0Denom          #change to log()
+    p1Vec = log(p1Num / p1Denom)
+    p0Vec = log(p0Num / p0Denom)
+    return p0Vec, p1Vec, pAbusive    #return perismo, 0(non-abusive first), then abusives.
 
 def classifyNB(vec2Classify, p0Vec, p1Vec, pClass1):
     p1 = sum(vec2Classify * p1Vec) + log(pClass1)    #element-wise mult
@@ -62,7 +68,7 @@ def bagOfWords2VecMN(vocabList, inputSet):
     return returnVec
 
 def testingNB():
-    listOPosts,listClasses = loadDataSet()
+    listOPosts, listClasses = loadDataSet()
     myVocabList = createVocabList(listOPosts)
     trainMat=[]
     for postinDoc in listOPosts:
@@ -169,3 +175,8 @@ def getTopWords(ny,sf):
     print "NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**"
     for item in sortedNY:
         print item[0]
+
+
+if '__main__' == __name__:
+    testingNB()
+
